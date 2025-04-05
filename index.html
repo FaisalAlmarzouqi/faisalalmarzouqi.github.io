@@ -100,14 +100,15 @@ button:hover {
 <body>
     <div class="container">
         <!-- Wrap the login section in a div with id "loginForm" -->
-        <div id="loginForm">
-          <h2>Login</h2>
-          <h3>To access your information</h3>
-          <input type="text" id="username" placeholder="Username" />
-          <input type="password" id="password" placeholder="Password" />
-          <button type="submit">Login</button>
-          <div id="error"></div>
-        </div>
+        <form id="loginForm">
+            <h2>Login</h2>
+            <h3>To access your information</h3>
+            <input type="text" id="username" placeholder="Username" />
+            <input type="password" id="password" placeholder="Password" />
+            <button type="submit">Login</button>
+            <div id="errorMessage" class="error-message"></div>
+          </form>
+          
       
         <!-- Old Dashboard Structure -->
         <div id="dashboard" style="display: none;">
