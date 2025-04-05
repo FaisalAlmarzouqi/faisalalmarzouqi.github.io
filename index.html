@@ -108,27 +108,33 @@ button:hover {
       <div id="error"></div>
     </div>
 
-    <div id="dashboard" style="display: none;">
-      <h2>Welcome!</h2>
-      <p>You are now logged in.</p>
-      
-      <div id="loading">Loading your data...</div>
-      <div id="profile" class="profile-data">
-        <p id="loginData"></p>
-        <p id="email"></p>
-        <p id="totalUp"></p>
-        <p id="totalDown"></p>
-        <p id="auditRatio"></p>
+  <!-- Old Dashboard Structure -->
+<div id="dashboard" style="display: none;">
+    <h2>Welcome!</h2>
+    <p>You are now logged in.</p>
+    
+    <div id="loading">Loading your data...</div>
+
+    <!-- Profile Data is now in a new container -->
+    <div id="profile-container">
+        <!-- Replace the old profile data fields with the new ones -->
+        <div id="userName"></div>
+        <div id="email"></div>
+        <div id="userLevel"></div>
+        <div id="userXP"></div>
+        <div id="audit"></div>
+
+        <!-- Graphs -->
         <div id="xpGraph"></div>
         <div id="auditRatioGraph"></div>
-      </div>
-      
-      <button onclick="logout()">Log Out</button>
     </div>
-  </div>
+
+    <!-- Log Out Button -->
+    <button onclick="logout()">Log Out</button>
+</div>
 
   <script src="login.js"></script>
-  <script src="graphs.js"></script>
-  <script src="dashbored.js"></script>
+  <script src="graph.js"></script>
+  <script type="module" src="dashbored.js"></script>
 </body>
 </html>
