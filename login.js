@@ -3,14 +3,16 @@ async function login() {
   const password = document.getElementById("password").value.trim();
   const errorDiv = document.getElementById("error");
 
-  // Clear any previous error messages
-  errorDiv.textContent = "";
+  // Base64 encode the username:password
+  const base64Credentials = btoa(username + ":" + password);
 
   try {
     const response = await fetch("https://learn.reboot01.com/api/auth/signin", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Basic " + base64Credentials, // Add Authorization header with Base64 credentials
+      },
     });
 
     const data = await response.json();
@@ -23,7 +25,7 @@ async function login() {
     }
   } catch (err) {
     errorDiv.textContent = "An error occurred.";
-    console.error(err); // Log the error to the console
+    console.error(err);
   }
 }
 
