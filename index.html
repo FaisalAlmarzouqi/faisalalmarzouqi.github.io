@@ -1,122 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GraphQL Client</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; }
-        textarea, input, button { width: 100%; margin-top: 10px; padding: 8px; }
-        #result { margin-top: 20px; white-space: pre-wrap; background: #f4f4f4; padding: 10px; border-radius: 5px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reboot01 GraphQL Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    input, button, textarea { display: block; width: 100%; margin: 10px 0; padding: 10px; }
+    #result { white-space: pre-wrap; background: #f4f4f4; padding: 10px; border-radius: 5px; }
+  </style>
 </head>
 <body>
-    <h2>Login</h2>
-    <input type="text" id="username" placeholder="Username">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Sign In</button>
-    
+  <h2>Login to Reboot01</h2>
+  <input type="text" id="username" placeholder="Username" />
+  <input type="password" id="password" placeholder="Password" />
+  <button onclick="login()">Sign In</button>
+
+  <div id="dashboard" style="display: none;">
     <h2>GraphQL Query</h2>
-    <textarea id="query" rows="5" placeholder="Enter your GraphQL query here..."></textarea>
+    <textarea id="query" rows="5">{ user { id username email } }</textarea>
     <button onclick="sendQuery()">Send Query</button>
-    
+
     <h3>Response:</h3>
     <div id="result">No data yet.</div>
-    <input type="text" id="username" placeholder="Username">
-    
-<input type="password" id="password" placeholder="Password">
-<button onclick="signIn()">Sign In</button>
+  </div>
 
-<button onclick="fetchGraphQLData()">Fetch Data</button>
-<pre id="result"></pre>
+  <script>
+    let token = "";
 
-    <script>
-        let token = '';
+    async function login() {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
 
-        async function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            const response = await fetch('http://localhost:5000/signin', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            
-            const data = await response.json();
-            if (data.token) {
-                token = data.token;
-                alert('Login successful!');
-            } else {
-                alert('Login failed!');
-            }
-        }
+      const res = await fetch("https://learn.reboot01.com/api/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ login: username, password: password })
+      });
 
-        async function sendQuery() {
-            const query = document.getElementById('query').value;
-            
-            const response = await fetch('http://localhost:5000/graphql', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token, query })
-            });
-            
-            const data = await response.json();
-            document.getElementById('result').innerText = JSON.stringify(data, null, 2);
-        }
-    </script>
-    <script>
-        async function signIn() {
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
-    
-            try {
-                const response = await fetch("http://localhost:5000/signin", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ username, password })
-                });
-    
-                const data = await response.json();
-    
-                if (response.ok) {
-                    localStorage.setItem("token", data.token);
-                    alert("Signed in successfully!");
-                } else {
-                    alert("Error: " + data.error);
-                }
-            } catch (error) {
-                console.error("Error:", error);
-            }
-        }
-    
-        async function fetchGraphQLData() {
-            const token = localStorage.getItem("token");
-            const query = `{
-                user {
-                    username
-                    email
-                }
-            }`;
-    
-            try {
-                const response = await fetch("http://localhost:5000/graphql", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ token, query })
-                });
-    
-                const data = await response.json();
-                document.getElementById("result").innerText = JSON.stringify(data, null, 2);
-            } catch (error) {
-                console.error("Error:", error);
-            }
-        }
-    </script>
-    
+      const data = await res.json();
+
+      if (res.ok && data) {
+        token = data;
+        document.getElementById("dashboard").style.display = "block";
+        alert("Login successful!");
+      } else {
+        alert("Login failed: " + (data?.error || "Unknown error"));
+      }
+    }
+
+    async function sendQuery() {
+      const query = document.getElementById("query").value;
+
+      const res = await fetch("https://learn.reboot01.com/api/graphql-engine/v1/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ query })
+      });
+
+      const data = await res.json();
+      document.getElementById("result").innerText = JSON.stringify(data, null, 2);
+    }
+  </script>
 </body>
 </html>
