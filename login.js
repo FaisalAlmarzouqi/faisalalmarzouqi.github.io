@@ -1,12 +1,10 @@
 async function login() {
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value.trim();
-  const errorBox = document.getElementById("error");
+  const errorDiv = document.getElementById("error");
 
-  if (!username || !password) {
-    errorBox.textContent = "Please enter both username and password.";
-    return;
-  }
+  // Clear any previous error messages
+  errorDiv.textContent = "";
 
   try {
     const response = await fetch("https://learn.reboot01.com/api/auth/signin", {
@@ -17,16 +15,32 @@ async function login() {
 
     const data = await response.json();
 
-    if (!response.ok) {
-      errorBox.textContent = data.error || "Login failed.";
-      return;
+    if (response.ok && data.token) {
+      localStorage.setItem("token", data.token); // Save the token
+      showDashboard();
+    } else {
+      errorDiv.textContent = "Login failed. Check your credentials.";
     }
-
-    // Store token in localStorage for later GraphQL access
-    localStorage.setItem("token", data.token); // Save the token
-    window.location.href = "dashbored.html"; // Redirect to dashboard
   } catch (err) {
-    console.error(err);
-    errorBox.textContent = "An error occurred. Please try again.";
+    errorDiv.textContent = "An error occurred.";
+    console.error(err); // Log the error to the console
   }
 }
+
+function showDashboard() {
+  document.getElementById("login").style.display = "none";
+  document.getElementById("dashboard").style.display = "block";
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("login").style.display = "block";
+}
+
+// Auto-login if token exists
+window.onload = () => {
+  if (localStorage.getItem("token")) {
+    showDashboard();
+  }
+};
