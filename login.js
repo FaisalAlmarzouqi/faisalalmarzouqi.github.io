@@ -49,3 +49,11 @@ async function login(username, password) {
   }
   return data.token;  // Ensure token is returned after login
 }
+document.addEventListener('DOMContentLoaded', function() {
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+      loginForm.addEventListener('submit', handleLogin);
+  } else {
+      console.error('Login form not found');
+  }
+});
