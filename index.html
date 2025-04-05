@@ -99,42 +99,39 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Login Section -->
-    <div id="login">
-      <h2>Login</h2>
-      <h3>To access your information</h3>
-      <input type="text" id="username" placeholder="Username" />
-      <input type="password" id="password" placeholder="Password" />
-      <button onclick="login()">Login</button>
-      <div id="error"></div>
-    </div>
-
-    <!-- Dashboard Structure (Hidden until logged in) -->
-    <div id="dashboard">
-      <h2>Welcome!</h2>
-      <p>You are now logged in.</p>
+    <div class="container">
+        <!-- Wrap the login section in a div with id "loginForm" -->
+        <div id="loginForm">
+          <h2>Login</h2>
+          <h3>To access your information</h3>
+          <input type="text" id="username" placeholder="Username" />
+          <input type="password" id="password" placeholder="Password" />
+          <button type="submit">Login</button>
+          <div id="error"></div>
+        </div>
       
-      <div id="loading">Loading your data...</div>
-
-      <!-- Profile Data Section -->
-      <div id="profile-container">
-        <div id="userName"></div>
-        <div id="email"></div>
-        <div id="userLevel"></div>
-        <div id="userXP"></div>
-        <div id="audit"></div>
-
-        <!-- Graphs -->
-        <div id="xpGraph"></div>
-        <div id="auditRatioGraph"></div>
+        <!-- Old Dashboard Structure -->
+        <div id="dashboard" style="display: none;">
+          <h2>Welcome!</h2>
+          <p>You are now logged in.</p>
+          <div id="loading">Loading your data...</div>
+      
+          <!-- Profile Data is now in a new container -->
+          <div id="profile-container">
+              <div id="userName"></div>
+              <div id="email"></div>
+              <div id="userLevel"></div>
+              <div id="userXP"></div>
+              <div id="audit"></div>
+              <div id="xpGraph"></div>
+              <div id="auditRatioGraph"></div>
+          </div>
+      
+          <!-- Log Out Button -->
+          <button onclick="logout()">Log Out</button>
+        </div>
       </div>
-
-      <!-- Log Out Button -->
-      <button onclick="logout()">Log Out</button>
-    </div>
-  </div>
-
+      
   <!-- Scripts for Login, Profile, and Graph -->
   <script src="login.js"></script>
   <script type="module" src="graph.js"></script>
