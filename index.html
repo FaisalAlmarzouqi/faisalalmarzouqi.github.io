@@ -22,19 +22,38 @@
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       width: 100%;
       max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     h2 {
       text-align: center;
+      margin-bottom: 0.5rem;
+      font-size: 1.5rem;
+    }
+
+    h3 {
+      color: transparent;
+      text-align: center;
       margin-bottom: 1rem;
+      font-size: 1rem;
+      font-weight: normal;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
     }
 
     input, button {
       display: block;
       width: 100%;
       margin: 10px 0;
-      padding: 10px;
+      padding: 12px;
       font-size: 1rem;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    input {
+      border: 1px solid #ddd;
     }
 
     button {
@@ -56,6 +75,8 @@
     #error {
       color: red;
       text-align: center;
+      margin-top: 10px;
+      font-size: 1rem;
     }
   </style>
 </head>
@@ -64,7 +85,7 @@
     <div id="login">
       <h2>Login</h2>
       <h3>To access your information</h3>
-     <input type="text" id="username" placeholder="Username" />
+      <input type="text" id="username" placeholder="Username" />
       <input type="password" id="password" placeholder="Password" />
       <button onclick="login()">Login</button>
       <div id="error"></div>
