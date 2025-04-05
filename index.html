@@ -5,94 +5,93 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>GraphQL Dashboard</title>
   <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f2f2f2;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
+   body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f2f2f2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-    .container {
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 400px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+.container {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-    h2 {
-      text-align: center;
-      margin-bottom: 0.5rem;
-      font-size: 1.5rem;
-    }
+h2 {
+  text-align: center;
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
 
-    h3 {
-      text-align: center;
-      margin-bottom: 1rem;
-      font-size: 1rem;
-      font-weight: normal;
-      text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-    }
+h3 {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: normal;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
 
-    #login {
-      width: 100%; /* Match the width of the container */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+#loginForm {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  /* Remove align-items to prevent centering */
+}
 
-    input, button {
-      display: block;
-      width: 100%; /* Ensure inputs and button are full-width */
-      margin: 10px 0;
-      padding: 12px;
-      font-size: 1rem;
-      border-radius: 10px;
-      box-sizing: border-box;
-    }
+input, button {
+  display: block;
+  width: 100%; /* Ensure inputs and button are full-width */
+  margin: 10px 0;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
 
-    input {
-      border: 1px solid #ddd;
-    }
+input {
+  border: 1px solid #ddd;
+}
 
-    button {
-      background-color: #222;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
+button {
+  background-color: #222;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
 
-    button:hover {
-      background-color: #444;
-    }
+button:hover {
+  background-color: #444;
+}
 
-    #dashboard {
-      display: none;
-    }
+#dashboard {
+  display: none;
+}
 
-    #error {
-      color: red;
-      text-align: center;
-      margin-top: 10px;
-      font-size: 1rem;
-    }
+#error {
+  color: red;
+  text-align: center;
+  margin-top: 10px;
+  font-size: 1rem;
+}
 
-    /* Add some styles for loading and profile data section */
-    #loading {
+  /* Add some styles for loading and profile data section */
+  #loading {
       display: none;
       text-align: center;
       margin-top: 20px;
       font-size: 1.2rem;
     }
-
     .profile-data {
       margin-top: 20px;
     }
@@ -132,7 +131,6 @@
         </div>
       </div>
       
-  <!-- Scripts for Login, Profile, and Graph -->
   <script src="login.js"></script>
   <script type="module" src="graph.js"></script>
   <script type="module" src="profile.js"></script>
