@@ -1,122 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GraphQL Client</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; }
-        textarea, input, button { width: 100%; margin-top: 10px; padding: 8px; }
-        #result { margin-top: 20px; white-space: pre-wrap; background: #f4f4f4; padding: 10px; border-radius: 5px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GraphQL Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+    input, button, textarea {
+      display: block;
+      width: 100%;
+      padding: 8px;
+      margin-top: 10px;
+    }
+    #dashboard {
+      margin-top: 30px;
+      display: none;
+    }
+    #result {
+      background: #f4f4f4;
+      padding: 10px;
+      border-radius: 5px;
+      white-space: pre-wrap;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-    <h2>Login</h2>
-    <input type="text" id="username" placeholder="Username">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Sign In</button>
-    
-    <h2>GraphQL Query</h2>
-    <textarea id="query" rows="5" placeholder="Enter your GraphQL query here..."></textarea>
-    <button onclick="sendQuery()">Send Query</button>
-    
-    <h3>Response:</h3>
+
+  <h2>Login</h2>
+  <input type="text" id="username" placeholder="Username" />
+  <input type="password" id="password" placeholder="Password" />
+  <button onclick="login()">Sign In</button>
+
+  <div id="dashboard">
+    <h2>Dashboard</h2>
+    <button onclick="fetchGraphQLData()">Fetch GraphQL Data</button>
     <div id="result">No data yet.</div>
-    <input type="text" id="username" placeholder="Username">
-    
-<input type="password" id="password" placeholder="Password">
-<button onclick="signIn()">Sign In</button>
+  </div>
 
-<button onclick="fetchGraphQLData()">Fetch Data</button>
-<pre id="result"></pre>
+  <!-- JavaScript at the end -->
+  <script src="frontend/components/login.js"></script>
 
-    <script>
-        let token = '';
-
-        async function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            const response = await fetch('http://localhost:5000/signin', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            
-            const data = await response.json();
-            if (data.token) {
-                token = data.token;
-                alert('Login successful!');
-            } else {
-                alert('Login failed!');
-            }
-        }
-
-        async function sendQuery() {
-            const query = document.getElementById('query').value;
-            
-            const response = await fetch('http://localhost:5000/graphql', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token, query })
-            });
-            
-            const data = await response.json();
-            document.getElementById('result').innerText = JSON.stringify(data, null, 2);
-        }
-    </script>
-    <script>
-        async function signIn() {
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
-    
-            try {
-                const response = await fetch("http://localhost:5000/signin", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ username, password })
-                });
-    
-                const data = await response.json();
-    
-                if (response.ok) {
-                    localStorage.setItem("token", data.token);
-                    alert("Signed in successfully!");
-                } else {
-                    alert("Error: " + data.error);
-                }
-            } catch (error) {
-                console.error("Error:", error);
-            }
-        }
-    
-        async function fetchGraphQLData() {
-            const token = localStorage.getItem("token");
-            const query = `{
-                user {
-                    username
-                    email
-                }
-            }`;
-    
-            try {
-                const response = await fetch("http://localhost:5000/graphql", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ token, query })
-                });
-    
-                const data = await response.json();
-                document.getElementById("result").innerText = JSON.stringify(data, null, 2);
-            } catch (error) {
-                console.error("Error:", error);
-            }
-        }
-    </script>
-    
 </body>
 </html>
