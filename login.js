@@ -6,6 +6,10 @@ async function login() {
   // Base64 encode the username:password
   const base64Credentials = btoa(username + ":" + password);
 
+  // Log credentials and Authorization header for debugging
+  console.log("Base64 Encoded Credentials:", base64Credentials);
+  console.log("Authorization Header: Basic " + base64Credentials);
+
   try {
     const response = await fetch("https://learn.reboot01.com/api/auth/signin", {
       method: "POST",
@@ -16,6 +20,9 @@ async function login() {
     });
 
     const data = await response.json();
+
+    // Log the response to see what is returned from the server
+    console.log("Response:", data);
 
     if (response.ok && data.token) {
       localStorage.setItem("token", data.token); // Save the token
@@ -28,6 +35,7 @@ async function login() {
     console.error(err);
   }
 }
+
 
 function showDashboard() {
   document.getElementById("login").style.display = "none";
