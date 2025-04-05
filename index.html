@@ -85,6 +85,16 @@ button:hover {
   font-size: 1rem;
 }
 
+  /* Add some styles for loading and profile data section */
+  #loading {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 1.2rem;
+    }
+    .profile-data {
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
@@ -98,14 +108,27 @@ button:hover {
       <div id="error"></div>
     </div>
 
-    <div id="dashboard">
+    <div id="dashboard" style="display: none;">
       <h2>Welcome!</h2>
       <p>You are now logged in.</p>
+      
+      <div id="loading">Loading your data...</div>
+      <div id="profile" class="profile-data">
+        <p id="loginData"></p>
+        <p id="email"></p>
+        <p id="totalUp"></p>
+        <p id="totalDown"></p>
+        <p id="auditRatio"></p>
+        <div id="xpGraph"></div>
+        <div id="auditRatioGraph"></div>
+      </div>
+      
       <button onclick="logout()">Log Out</button>
     </div>
   </div>
 
-  <!-- Link to external JavaScript file -->
   <script src="login.js"></script>
+  <script src="graphs.js"></script>
+  <script src="dashbored.js"></script>
 </body>
 </html>
