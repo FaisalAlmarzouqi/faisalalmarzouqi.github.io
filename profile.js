@@ -99,19 +99,6 @@ async function loadProfile() {
   }
 }
 
-// Call fetchProfile or loadProfile when the page loads
-window.onload = async () => {
-  if (localStorage.getItem("jwt")) {
-      await fetchProfile();  // Fetch and render user data when logged in
-  } else if (window.location.pathname !== "/index.html") {
-      // If the page isn't the login page, redirect to login
-      if (!window.redirected) {
-          window.redirected = true;  // Flag to prevent repeated redirects
-          window.location.href = "index.html";
-      }
-  }
-};
-
 // Helper function to extract user ID from JWT (assuming you have this logic)
 async function getUserIdFromToken() {
   const jwt = localStorage.getItem('jwt');
@@ -133,11 +120,15 @@ function decodeJWT(token) {
 }
 
 // Call fetchProfile or loadProfile when the page loads
-window.onload = () => {
+window.onload = async () => {
   if (localStorage.getItem("jwt")) {
-      fetchProfile();  // Fetch and render user data when logged in
-  } else {
-      window.location.href = 'index.html';  // Redirect to login if no token
+      await fetchProfile();  // Fetch and render user data when logged in
+  } else if (window.location.pathname !== "/index.html") {
+      // If the page isn't the login page, redirect to login
+      if (!window.redirected) {
+          window.redirected = true;  // Flag to prevent repeated redirects
+          window.location.href = "index.html";
+      }
   }
 };
 
