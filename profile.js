@@ -7,10 +7,6 @@ async function fetchProfile() {
   // No token at all
   if (!token) {
       displayError("No JWT found. Please log in.");
-      if (window.location.pathname !== "/index.html" && !window.redirected) {
-          window.redirected = true;
-          window.location.href = "index.html";
-      }
       return;
   }
 
@@ -18,10 +14,6 @@ async function fetchProfile() {
   if (token.split('.').length !== 3) {
       displayError("Malformed JWT detected. Please log in again.");
       localStorage.removeItem("jwt");
-      if (window.location.pathname !== "/index.html" && !window.redirected) {
-          window.redirected = true;
-          window.location.href = "index.html";
-      }
       return;
   }
 
@@ -72,13 +64,14 @@ async function fetchProfile() {
       renderXPGraph(xpData);
       renderAuditRatio({ user: [profileData] });
 
-      // Call loadProfile for additional user-specific data (like level, user stats)
+      // Additional profile data
       await loadProfile();
   } catch (error) {
       console.error("GraphQL error:", error);
       displayError("Failed to load profile data: " + error.message);
   }
 }
+
 
 
 // Load profile data including title, level, and more
@@ -133,21 +126,21 @@ function decodeJWT(token) {
 }
 
 // Call fetchProfile or loadProfile when the page loads
+// Call fetchProfile when the page loads
 window.onload = async () => {
   console.log('Window loaded. Checking for JWT...');
-  
-  if (localStorage.getItem("jwt")) {
-      await fetchProfile();  // Fetch and render user data when logged in
-  } else {
-      console.log('No JWT found. Redirecting to login...');
-      if (window.location.pathname !== "/index.html") {
-          if (!window.redirected) {
-              window.redirected = true;
-              window.location.href = "index.html"; // Redirect to login page
-          }
-      }
+
+  const token = localStorage.getItem("jwt");
+
+  if (!token) {
+    console.log('No JWT found.');
+    displayError("No JWT found. Please log in.");
+    return;
   }
+
+  await fetchProfile();  // Fetch and render user data when token exists
 };
+
 function displayError(message) {
   const errorBox = document.getElementById("errorMessage");
   const loading = document.getElementById("loading");
