@@ -7,32 +7,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   loginForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-
+  
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
-
+  
     try {
-      const success = await login(username, password);
-
-      if (success) {
-        localStorage.setItem('jwt', 'session-ok'); // Optional, for your own tracking
-        window.location.href = 'dashbored.html';
-      }
-      
-      // if (success) {
-      //   localStorage.setItem('jwt', 'session-ok');  // Save dummy session token
-      //   window.location.href = 'dashbored.html';    // ✅ Redirect
-      // } else {
-      if (success=false){
+      const jwt = await login(username, password); // Get the actual JWT
+  
+      if (jwt) {
+        localStorage.setItem("jwt", jwt); // ✅ Save the real token
+        window.location.href = 'dashbored.html'; // Redirect
+      } else {
         showError('Invalid credentials. Please try again.');
       }
-      //   showError('Invalid credentials. Please try again.');
-      // }
     } catch (err) {
       console.error('Login error:', err);
       showError('An error occurred. Please try again.');
     }
   });
+  
 
   function showError(message) {
     const errorBox = document.getElementById('errorMessage');
@@ -57,8 +50,15 @@ async function login(username, password) {
   console.log('Login status:', response.status);
 
   if (response.status === 200) {
-    return true;
+    const authHeader = response.headers.get('Authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const jwt = authHeader.split(' ')[1];
+      console.log('JWT received:', jwt);
+      return jwt;
+    } else {
+      console.warn('JWT not found in Authorization header');
+    }
   }
 
-  return false;
+  return null; // failed login
 }
