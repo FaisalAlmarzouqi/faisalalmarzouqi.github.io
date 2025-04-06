@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       localStorage.setItem('jwt', token);
-      window.location.href = 'profile.html';  // ✅ make sure this matches your file
+      window.location.href = 'dashbored.html';  // ✅ Redirect to dashboard
     } catch (err) {
       console.error('Login error:', err);
       showError('An error occurred. Please try again.');
@@ -33,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
     errorBox.innerText = message;
     errorBox.classList.add('show');
 
-    // Optionally clear the input fields
     document.getElementById('username').value = '';
     document.getElementById('password').value = '';
 
@@ -53,11 +52,21 @@ async function login(username, password) {
     },
   });
 
+  if (response.status === 204) {
+    // ✅ Successful login with no body
+    return 'session-token-placeholder'; // You can use any string to represent success
+  }
+
   if (!response.ok) return null;
 
   const text = await response.text();
   if (!text) return null;
 
-  const data = JSON.parse(text);
-  return data.token;
+  try {
+    const data = JSON.parse(text);
+    return data.token || null;
+  } catch (err) {
+    console.warn('Non-JSON response received');
+    return null;
+  }
 }

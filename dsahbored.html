@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+      background-color: #f2f2f2;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+    }
+    .section {
+      margin-top: 20px;
+    }
+    .label {
+      font-weight: bold;
+    }
+    .graph {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to your Dashboard</h1>
+
+    <div id="loading">Loading your profile data...</div>
+
+    <div id="profile" style="display:none;">
+      <div class="section">
+        <div><span class="label">Login:</span> <span id="loginData"></span></div>
+        <div><span class="label">Email:</span> <span id="email"></span></div>
+        <div><span class="label">Total Up:</span> <span id="totalUp"></span></div>
+        <div><span class="label">Total Down:</span> <span id="totalDown"></span></div>
+        <div><span class="label">Audit Ratio:</span> <span id="auditRatio"></span></div>
+      </div>
+
+      <div class="graph" id="xpGraph"></div>
+      <div class="graph" id="auditRatioGraph"></div>
+
+      <button onclick="logout()">Log Out</button>
+    </div>
+  </div>
+
+  <script type="module" src="profile.js"></script>
+  <script>
+    function logout() {
+      localStorage.removeItem('jwt');
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
