@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
       //   localStorage.setItem('jwt', 'session-ok');  // Save dummy session token
       //   window.location.href = 'dashbored.html';    // ✅ Redirect
       // } else {
+      if (success=false){
+        showError('Invalid credentials. Please try again.');
+      }
       //   showError('Invalid credentials. Please try again.');
       // }
     } catch (err) {
@@ -53,7 +56,7 @@ async function login(username, password) {
 
   console.log('Login status:', response.status);
 
-  if (response.status === 204 || response.status === 200) {
+  if (response.status === 200) {
     return true;
   }
 
