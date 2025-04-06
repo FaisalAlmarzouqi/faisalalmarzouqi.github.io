@@ -12,20 +12,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const password = document.getElementById('password').value.trim();
   
     try {
-      const jwt = await login(username, password); // Get the actual JWT
-  
-      if (jwt) {
-        localStorage.setItem("jwt", jwt); // ✅ Save the real token
-        window.location.href = 'dashbored.html'; // Redirect
-      } else {
-        showError('Invalid credentials. Please try again.');
-      }
+      await login(username, password); // Perform login
+
+      // After successful login, the JWT is stored in localStorage and user is redirected
+      window.location.href = 'dashbored.html'; // Redirect to dashboard
     } catch (err) {
       console.error('Login error:', err);
       showError('An error occurred. Please try again.');
     }
   });
-  
 
   function showError(message) {
     const errorBox = document.getElementById('errorMessage');
@@ -38,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// Updated login function to use Basic Authentication with the correct server API
 async function login(username, password) {
   const encoded = btoa(`${username}:${password}`);
   console.log("Trying to log in with Basic Auth:", encoded);
