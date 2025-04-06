@@ -2,13 +2,13 @@
 async function fetchProfile() {
   const token = localStorage.getItem("jwt");
 
-  // Log the token for debugging purposes
-  console.log("JWT Token:", token);
-
   if (!token || token.split('.').length !== 3) {
       console.error("Invalid or missing JWT token.");
       localStorage.removeItem("jwt");  // Remove invalid token
-      window.location.href = "index.html";  // Redirect to login
+      // Only redirect if on the profile page
+      if (window.location.pathname !== "/index.html") {
+          window.location.href = "index.html";  // Redirect to login
+      }
       return;
   }
 
@@ -98,8 +98,11 @@ async function loadProfile() {
 
 // Call fetchProfile or loadProfile when the page loads
 window.onload = async () => {
+  // Only proceed to fetch profile if we have a token
   if (localStorage.getItem("jwt")) {
       await fetchProfile();  // Fetch and render user data when logged in
+  } else if (window.location.pathname !== "/index.html") {
+      window.location.href = "index.html";  // Redirect to login page if no token
   }
 };
 
