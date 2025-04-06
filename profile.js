@@ -2,6 +2,8 @@
 async function fetchProfile() {
   const token = localStorage.getItem("jwt");
 
+  console.log('Token fetched:', token);  // Debugging log
+
   // Check for missing or invalid token
   if (!token || token.split('.').length !== 3) {
       console.error("Invalid or missing JWT token.");
@@ -66,6 +68,9 @@ async function fetchProfile() {
       await loadProfile();
   } catch (error) {
       console.error("GraphQL error:", error);
+      // If there's an error fetching profile, redirect to login
+      window.redirected = true;
+      window.location.href = "index.html";
   }
 }
 
@@ -121,13 +126,17 @@ function decodeJWT(token) {
 
 // Call fetchProfile or loadProfile when the page loads
 window.onload = async () => {
+  console.log('Window loaded. Checking for JWT...');
+  
   if (localStorage.getItem("jwt")) {
       await fetchProfile();  // Fetch and render user data when logged in
-  } else if (window.location.pathname !== "/index.html") {
-      // If the page isn't the login page, redirect to login
-      if (!window.redirected) {
-          window.redirected = true;  // Flag to prevent repeated redirects
-          window.location.href = "index.html";
+  } else {
+      console.log('No JWT found. Redirecting to login...');
+      if (window.location.pathname !== "/index.html") {
+          if (!window.redirected) {
+              window.redirected = true;
+              window.location.href = "index.html"; // Redirect to login page
+          }
       }
   }
 };
