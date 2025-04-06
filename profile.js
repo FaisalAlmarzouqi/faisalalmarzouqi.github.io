@@ -4,14 +4,22 @@ async function fetchProfile() {
 
   console.log('Token fetched:', token);  // Debugging log
 
-  // Check for missing or invalid token
-  if (!token || token.split('.').length !== 3) {
-      console.error("Invalid or missing JWT token.");
-      localStorage.removeItem("jwt");  // Remove invalid token
-
-      // If we're on the profile page, redirect to login (index.html)
+  // No token at all
+  if (!token) {
+      displayError("No JWT found. Please log in.");
       if (window.location.pathname !== "/index.html" && !window.redirected) {
-          window.redirected = true;  // Set a flag to prevent repeated redirects
+          window.redirected = true;
+          window.location.href = "index.html";
+      }
+      return;
+  }
+
+  // Malformed token
+  if (token.split('.').length !== 3) {
+      displayError("Malformed JWT detected. Please log in again.");
+      localStorage.removeItem("jwt");
+      if (window.location.pathname !== "/index.html" && !window.redirected) {
+          window.redirected = true;
           window.location.href = "index.html";
       }
       return;
@@ -68,20 +76,20 @@ async function fetchProfile() {
       await loadProfile();
   } catch (error) {
       console.error("GraphQL error:", error);
-      // If there's an error fetching profile, redirect to login
-      window.redirected = true;
-      window.location.href = "index.html";
+      displayError("Failed to load profile data: " + error.message);
   }
 }
+
 
 // Load profile data including title, level, and more
 async function loadProfile() {
   const userId = await getUserIdFromToken();
 
   if (!userId) {
-      console.error('Failed to retrieve user ID');
-      return;
-  }
+    displayError("Invalid or expired token. Please log in again.");
+    return;
+}
+
 
   try {
       const titleData = await fetchData(getTitleData, { userId });
@@ -140,6 +148,14 @@ window.onload = async () => {
       }
   }
 };
+function displayError(message) {
+  const errorBox = document.getElementById("errorMessage");
+  const loading = document.getElementById("loading");
+  errorBox.innerText = message;
+  errorBox.style.display = "block";
+  loading.style.display = "none";
+  document.getElementById("profile").style.display = "none";
+}
 
 // Logout function
 function logout() {
