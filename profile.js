@@ -22,7 +22,7 @@ async function fetchProfile() {
           method: "POST",
           headers: {
               "Content-Type": "application/json",
-              "Authorization": "Bearer " + localStorage.getItem("token"),
+              "Authorization": "Bearer " + localStorage.getItem("jwt"), // Adjusted for token
           },
           body: JSON.stringify({ query }),
       });
@@ -51,6 +51,7 @@ async function fetchProfile() {
       await loadProfile();
   } catch (error) {
       console.error("GraphQL error:", error);
+      document.getElementById('loading').innerText = 'Failed to load data. Please try again later.';
   }
 }
 
@@ -70,10 +71,10 @@ async function loadProfile() {
 
       // Display user info in the new profile container
       document.getElementById('userName').innerText = `Hello, ${titleData.user[0].firstName} ${titleData.user[0].lastName} !`;
-      document.getElementById('email').innerText = ` ${titleData.user[0].email}`;
-      document.getElementById('userLevel').innerText = `${titleData.event_user[0].level}`;
-      document.getElementById('userXP').innerText = ` ${(xpForProjects.transaction.reduce((acc, tx) => acc + tx.amount, 0) / 1000).toFixed(1)} Kb`;
-      document.getElementById('audit').innerText = `${(auditData.user[0].auditRatio).toFixed(1)}`;
+      document.getElementById('email').innerText = `Email: ${titleData.user[0].email}`;
+      document.getElementById('userLevel').innerText = `Level: ${titleData.event_user[0].level}`;
+      document.getElementById('userXP').innerText = `XP: ${(xpForProjects.transaction.reduce((acc, tx) => acc + tx.amount, 0) / 1000).toFixed(1)} Kb`;
+      document.getElementById('audit').innerText = `Audit Ratio: ${(auditData.user[0].auditRatio).toFixed(1)}`;
 
       // Render graphs
       renderXPGraph(xpForProjects);
@@ -84,10 +85,37 @@ async function loadProfile() {
   }
 }
 
+// Helper function to extract user ID from JWT (assuming you have this logic)
+async function getUserIdFromToken() {
+  const jwt = localStorage.getItem('jwt');
+  if (!jwt) return null;
+
+  try {
+      const decodedToken = decodeJWT(jwt);  // Assuming you have a decodeJWT function
+      return decodedToken.userId;
+  } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;
+  }
+}
+
+// Mockup for decoding JWT (replace with actual decoding logic)
+function decodeJWT(token) {
+  const payload = token.split('.')[1];  // Assuming standard JWT structure (header.payload.signature)
+  return JSON.parse(atob(payload));  // Decode base64 and parse as JSON
+}
 
 // Call fetchProfile or loadProfile when the page loads
 window.onload = () => {
-  if (localStorage.getItem("token")) {
+  if (localStorage.getItem("jwt")) {
       fetchProfile();  // Fetch and render user data when logged in
+  } else {
+      window.location.href = 'index.html';  // Redirect to login if no token
   }
 };
+
+// Logout function
+function logout() {
+  localStorage.removeItem('jwt');
+  window.location.href = 'index.html';  // Redirect to login page after logout
+}
