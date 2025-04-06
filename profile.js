@@ -1,10 +1,14 @@
 // Fetch Profile and render data
 async function fetchProfile() {
   const token = localStorage.getItem("jwt");
-  console.log("JWT Token:", token);  // Check if the token is correct
 
-  if (!token) {
-      console.error("No JWT token found");
+  // Log the token for debugging purposes
+  console.log("JWT Token:", token);
+
+  if (!token || token.split('.').length !== 3) {
+      console.error("Invalid or missing JWT token.");
+      localStorage.removeItem("jwt");  // Remove invalid token
+      window.location.href = "index.html";  // Redirect to login
       return;
   }
 
@@ -62,7 +66,6 @@ async function fetchProfile() {
   }
 }
 
-
 // Load profile data including title, level, and more
 async function loadProfile() {
   const userId = await getUserIdFromToken();
@@ -79,10 +82,10 @@ async function loadProfile() {
 
       // Display user info in the new profile container
       document.getElementById('userName').innerText = `Hello, ${titleData.user[0].firstName} ${titleData.user[0].lastName} !`;
-      document.getElementById('email').innerText = `Email: ${titleData.user[0].email}`;
-      document.getElementById('userLevel').innerText = `Level: ${titleData.event_user[0].level}`;
-      document.getElementById('userXP').innerText = `XP: ${(xpForProjects.transaction.reduce((acc, tx) => acc + tx.amount, 0) / 1000).toFixed(1)} Kb`;
-      document.getElementById('audit').innerText = `Audit Ratio: ${(auditData.user[0].auditRatio).toFixed(1)}`;
+      document.getElementById('email').innerText = ` ${titleData.user[0].email}`;
+      document.getElementById('userLevel').innerText = `${titleData.event_user[0].level}`;
+      document.getElementById('userXP').innerText = ` ${(xpForProjects.transaction.reduce((acc, tx) => acc + tx.amount, 0) / 1000).toFixed(1)} Kb`;
+      document.getElementById('audit').innerText = `${(auditData.user[0].auditRatio).toFixed(1)}`;
 
       // Render graphs
       renderXPGraph(xpForProjects);
@@ -92,6 +95,13 @@ async function loadProfile() {
       console.error('Error loading profile data:', error);
   }
 }
+
+// Call fetchProfile or loadProfile when the page loads
+window.onload = async () => {
+  if (localStorage.getItem("jwt")) {
+      await fetchProfile();  // Fetch and render user data when logged in
+  }
+};
 
 // Helper function to extract user ID from JWT (assuming you have this logic)
 async function getUserIdFromToken() {
