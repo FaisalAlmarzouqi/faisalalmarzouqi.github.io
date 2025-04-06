@@ -15,11 +15,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const success = await login(username, password);
 
       if (success) {
-        localStorage.setItem('jwt', 'session-ok');  // Save dummy session token
-        window.location.href = 'dashbored.html';    // ✅ Redirect
-      } else {
-        showError('Invalid credentials. Please try again.');
+        localStorage.setItem('jwt', 'session-ok'); // Optional, for your own tracking
+        window.location.href = 'dashbored.html';
       }
+      
+      // if (success) {
+      //   localStorage.setItem('jwt', 'session-ok');  // Save dummy session token
+      //   window.location.href = 'dashbored.html';    // ✅ Redirect
+      // } else {
+      //   showError('Invalid credentials. Please try again.');
+      // }
     } catch (err) {
       console.error('Login error:', err);
       showError('An error occurred. Please try again.');
