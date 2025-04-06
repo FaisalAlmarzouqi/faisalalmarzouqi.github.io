@@ -10,18 +10,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
-    const errorBox = document.getElementById('errorMessage');
 
     try {
-      const token = await login(username, password);
+      const success = await login(username, password);
 
-      if (!token) {
+      if (success) {
+        localStorage.setItem('jwt', 'session-ok');  // Save dummy session token
+        window.location.href = 'dashbored.html';    // ✅ Redirect
+      } else {
         showError('Invalid credentials. Please try again.');
-        return;
       }
-
-      localStorage.setItem('jwt', token);
-      window.location.href = 'dashbored.html';  // ✅ Redirect to dashboard
     } catch (err) {
       console.error('Login error:', err);
       showError('An error occurred. Please try again.');
@@ -32,10 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorBox = document.getElementById('errorMessage');
     errorBox.innerText = message;
     errorBox.classList.add('show');
-
-    document.getElementById('username').value = '';
-    document.getElementById('password').value = '';
-
     setTimeout(() => {
       errorBox.classList.remove('show');
       errorBox.innerText = '';
@@ -52,21 +46,11 @@ async function login(username, password) {
     },
   });
 
-  if (response.status === 204) {
-    // ✅ Successful login with no body
-    return 'session-token-placeholder'; // You can use any string to represent success
+  console.log('Login status:', response.status);
+
+  if (response.status === 204 || response.status === 200) {
+    return true;
   }
 
-  if (!response.ok) return null;
-
-  const text = await response.text();
-  if (!text) return null;
-
-  try {
-    const data = JSON.parse(text);
-    return data.token || null;
-  } catch (err) {
-    console.warn('Non-JSON response received');
-    return null;
-  }
+  return false;
 }
