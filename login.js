@@ -50,15 +50,20 @@ async function login(username, password) {
   console.log('Login status:', response.status);
 
   if (response.status === 200) {
-    const authHeader = response.headers.get('Authorization');
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const jwt = authHeader.split(' ')[1];
-      console.log('JWT received:', jwt);
-      return jwt;
-    } else {
-      console.warn('JWT not found in Authorization header');
-    }
+  const authHeader = response.headers.get('Authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const jwt = authHeader.split(' ')[1];
+    console.log('JWT received:', jwt);
+    return jwt;
+  } else {
+    console.warn('JWT not found in Authorization header');
   }
+}
 
+  // if (response.status === 200) {
+  //   localStorage.setItem('jwt', 'session-ok'); // Set dummy token
+  //   return true;
+  // }
+  
   return null; // failed login
 }

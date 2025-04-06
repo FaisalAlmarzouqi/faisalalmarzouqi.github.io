@@ -127,31 +127,54 @@ function decodeJWT(token) {
 
 // Call fetchProfile or loadProfile when the page loads
 // Call fetchProfile when the page loads
+// window.onload = async () => {
+//   console.log('Window loaded. Checking for JWT...');
+
+//   const token = localStorage.getItem("jwt");
+
+//   if (!token) {
+//     console.log('No JWT found.');
+//     displayError("No JWT found. Please log in.");
+//     return;
+//   }
+
+//   await fetchProfile();  // Fetch and render user data when token exists
+// };
+
 window.onload = async () => {
   console.log('Window loaded. Checking for JWT...');
-
   const token = localStorage.getItem("jwt");
 
   if (!token) {
-    console.log('No JWT found.');
-    displayError("No JWT found. Please log in.");
+    displayError("You're not logged in. Please log in first.");
     return;
   }
 
-  await fetchProfile();  // Fetch and render user data when token exists
+  await fetchProfile();
 };
 
-function displayError(message) {
-  const errorBox = document.getElementById("errorMessage");
-  const loading = document.getElementById("loading");
-  errorBox.innerText = message;
-  errorBox.style.display = "block";
-  loading.style.display = "none";
-  document.getElementById("profile").style.display = "none";
-}
+
+
 
 // Logout function
 function logout() {
   localStorage.removeItem('jwt');
   window.location.href = 'index.html';  // Redirect to login page after logout
 }
+function displayError(message) {
+  const errorBox = document.getElementById("errorMessage");
+  if (!errorBox) {
+    console.error("Error box not found");
+    return;
+  }
+
+  errorBox.innerText = message;
+  errorBox.style.display = "block";
+
+  const loading = document.getElementById("loading");
+  if (loading) loading.style.display = "none";
+
+  const profile = document.getElementById("profile");
+  if (profile) profile.style.display = "none";
+}
+
