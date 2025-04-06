@@ -1,5 +1,13 @@
 // Fetch Profile and render data
 async function fetchProfile() {
+  const token = localStorage.getItem("jwt");
+  console.log("JWT Token:", token);  // Check if the token is correct
+
+  if (!token) {
+      console.error("No JWT token found");
+      return;
+  }
+
   const query = `
   {
       user {
@@ -22,7 +30,7 @@ async function fetchProfile() {
           method: "POST",
           headers: {
               "Content-Type": "application/json",
-              "Authorization": "Bearer " + localStorage.getItem("jwt"), // Adjusted for token
+              "Authorization": "Bearer " + token,
           },
           body: JSON.stringify({ query }),
       });
@@ -51,9 +59,9 @@ async function fetchProfile() {
       await loadProfile();
   } catch (error) {
       console.error("GraphQL error:", error);
-      document.getElementById('loading').innerText = 'Failed to load data. Please try again later.';
   }
 }
+
 
 // Load profile data including title, level, and more
 async function loadProfile() {
