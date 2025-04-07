@@ -1,11 +1,19 @@
 async function fetchUserProfile() {
   const token = localStorage.getItem("jwt");
 
-  // If no token, redirect once
   if (!token) {
-    // if (window.location.pathname !== "index.html") { // Prevent redirect if already on login page
-    //   window.location.href = "index.html";
-    // }
+    console.warn("No JWT token found. Redirecting to login.");
+    // Optional: redirect to login
+    // window.location.href = "index.html";
+    return;
+  }
+
+  // Debug: Log JWT format
+  if (!token.includes('.') || token.split('.').length !== 3) {
+    console.warn("Invalid JWT format. Clearing token and redirecting.");
+    localStorage.removeItem("jwt");
+    // Optional: redirect
+    // window.location.href = "index.html";
     return;
   }
 
@@ -22,34 +30,39 @@ async function fetchUserProfile() {
   `;
 
   try {
-    const response = await fetch("/graphql", {
+    const response = await fetch("https://learn.reboot01.com/api/graphql-engine/v1/graphql", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, query }),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({ query }),
     });
 
     const result = await response.json();
 
-    // If the token is invalid or the GraphQL request failed
     if (result.errors || !result.data) {
-      console.warn("Invalid token or GraphQL error", result.errors);
+      console.warn("GraphQL error or invalid token:", result.errors);
       localStorage.removeItem("jwt");
-      // if (window.location.pathname !== "index.html") { // Prevent redirect if already on login page
-      //   window.location.href = "index.html";
-      // }
+      // Optional: redirect to login
+      // window.location.href = "index.html";
       return;
     }
 
     const user = result.data.user;
-    document.getElementById("username").textContent = `${user.firstName} ${user.lastName} (@${user.login})`;
+    document.getElementById("loginData").textContent = `${user.firstName} ${user.lastName} (@${user.login})`;
     document.getElementById("email").textContent = user.email;
+
+    // Hide loading, show profile content
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("profile").style.display = "block";
   } catch (error) {
-    console.error("Fetch profile error:", error);
+    console.error("Error fetching user profile:", error);
     localStorage.removeItem("jwt");
-    // if (window.location.pathname !== "index.html") { // Prevent redirect if already on login page
-    //   window.location.href = "index.html";
-    // }
+    // Optional: redirect to login
+    // window.location.href = "index.html";
   }
 }
 
-window.onload = fetchUserProfile;
+// Auto-run on page load
+window.addEventListener("DOMContentLoaded", fetchUserProfile);

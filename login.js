@@ -1,38 +1,42 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const loginForm = document.getElementById('loginForm');
-  if (!loginForm) {
-    console.error('Login form not found');
-    return;
-  }
+document.getElementById("loginForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
 
-  loginForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-  
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
-  
-    try {
-      await login(username, password); // Perform login
+  const identifier = document.getElementById("identifier").value;  // Get username
+  const password = document.getElementById("password").value;      // Get password
 
-      // After successful login, the JWT is stored in localStorage and user is redirected
-      window.location.href = 'dashbored.html'; // Redirect to dashboard
-    } catch (err) {
-      console.error('Login error:', err);
-      showError('An error occurred. Please try again.');
+  try {
+    const response = await fetch('https://learn.reboot01.com/api/auth/signin', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: identifier,  // Ensure this matches the API's expected field name
+        password: password,
+      }),
+    });
+
+    const result = await response.json();
+    console.log("Login response text:", result);
+
+    if (result.jwt) {
+      localStorage.setItem("jwt", result.jwt);
+      window.location.href = "dashbored.html"; // Redirect to dashboard after successful login
+    } else {
+      document.getElementById("errorMessage").textContent = result?.error || "Login failed.";
     }
-  });
-
-  function showError(message) {
-    const errorBox = document.getElementById('errorMessage');
-    errorBox.innerText = message;
-    errorBox.classList.add('show');
-    setTimeout(() => {
-      errorBox.classList.remove('show');
-      errorBox.innerText = '';
-    }, 3000);
+  } catch (error) {
+    console.error("Login error:", error);
+    document.getElementById("errorMessage").textContent = "Network error.";
   }
 });
 
+
+
+
+
+
+// Updated login function to use Basic Authentication with the correct server API
 // Updated login function to use Basic Authentication with the correct server API
 async function login(username, password) {
   const encoded = btoa(`${username}:${password}`);

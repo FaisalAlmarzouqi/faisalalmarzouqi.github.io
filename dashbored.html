@@ -73,7 +73,10 @@
         <div><span class="label">Total Down:</span> <span id="totalDown"></span></div>
         <div><span class="label">Audit Ratio:</span> <span id="auditRatio"></span></div>
       </div>
-
+      <div id="graph-audit-ratio"></div>
+      <div id="graph-total-up"></div>
+      <div id="graph-total-down"></div>
+      
       <div class="graph" id="xpGraph"></div>
       <div class="graph" id="auditRatioGraph"></div>
       <div id="errorMessage" style="display:none; color: red; text-align: center; margin-top: 10px;"></div>
@@ -85,7 +88,7 @@
 
   <script type="module" src="profile.js"></script>
   <script type="module" src="graph.js"></script>
-  <link rel="icon" href="favicon.ico">
+  <link rel="icon" href="data:,">
   <script>
     function logout() {
       localStorage.removeItem('jwt');
