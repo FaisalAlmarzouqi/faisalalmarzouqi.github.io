@@ -19,5 +19,14 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FaisalAlmarzouqi/faisalalmarzouqi.github.io.git"
+  },
+  "bugs": {
+    "url": "https://github.com/FaisalAlmarzouqi/faisalalmarzouqi.github.io/issues"
+  },
+  "homepage": "https://github.com/FaisalAlmarzouqi/faisalalmarzouqi.github.io#readme"
 }

@@ -2,98 +2,61 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="./profile.js" defer></script>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f2f2f2;
+      font-family: sans-serif;
+      background-color: #f5f5f5;
       margin: 0;
-      padding: 2rem;
-    }
-
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 20px;
     }
 
     h1 {
       text-align: center;
     }
 
-    .section {
-      margin-top: 20px;
+    .charts {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      gap: 30px;
     }
 
-    .label {
-      font-weight: bold;
+    .chart-box {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 30%;
+      min-width: 300px;
     }
 
-    .graph {
-      margin-top: 20px;
-    }
-
-    button {
-      margin-top: 20px;
-      padding: 12px;
+    canvas {
       width: 100%;
-      border: none;
-      border-radius: 10px;
-      background-color: #222;
-      color: white;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #444;
-    }
-
-    #loading {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 1.2rem;
+      height: auto;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Welcome to your Dashboard</h1>
+  <h1>Your Dashboard</h1>
+  <div class="charts">
+    <div class="chart-box">
+      <h3>XP Progress</h3>
+      <canvas id="xpChart"></canvas>
+    </div>
 
-    <div id="loading">Loading your profile data...</div>
+    <div class="chart-box">
+      <h3>Audit Ratio</h3>
+      <canvas id="auditChart"></canvas>
+    </div>
 
-    <div id="profile" style="display:none;">
-      <div class="section">
-        <div><span class="label">Login:</span> <span id="loginData"></span></div>
-        <div><span class="label">Email:</span> <span id="email"></span></div>
-        <div><span class="label">Total Up:</span> <span id="totalUp"></span></div>
-        <div><span class="label">Total Down:</span> <span id="totalDown"></span></div>
-        <div><span class="label">Audit Ratio:</span> <span id="auditRatio"></span></div>
-      </div>
-      <div id="graph-audit-ratio"></div>
-      <div id="graph-total-up"></div>
-      <div id="graph-total-down"></div>
-      
-      <div class="graph" id="xpGraph"></div>
-      <div class="graph" id="auditRatioGraph"></div>
-      <div id="errorMessage" style="display:none; color: red; text-align: center; margin-top: 10px;"></div>
-      <div id="errorBox" style="display: none;"></div>
-
-      <button onclick="logout()">Log Out</button>
+    <div class="chart-box">
+      <h3>Project Ratio</h3>
+      <canvas id="projectChart"></canvas>
     </div>
   </div>
-
-  <script type="module" src="profile.js"></script>
-  <script type="module" src="graph.js"></script>
-  <link rel="icon" href="data:,">
-  <script>
-    function logout() {
-      localStorage.removeItem('jwt');
-      window.location.href = 'index.html';
-    }
-  </script>
 </body>
 </html>
