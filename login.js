@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const token = data;
 
             if (token) {
-        localStorage.setItem("jwt", `Bearer ${data.token}`);
+        localStorage.setItem("jwt", token);
         window.location.href = "dashbored.html";
       } else {
         throw new Error("Token not received");
@@ -53,3 +53,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+

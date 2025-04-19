@@ -1,61 +1,66 @@
 import { fetchGraphData } from './fetchgraph.js';
 
+const token = localStorage.getItem("jwt");
+
+if (!token) {
+  alert("You're not logged in. Redirecting to login page.");
+  window.location.href = "index.html";
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    await loadXPData();
-    await loadAuditRatio();
-    await loadProjectRatio();
+    const xpData = await loadXPData();
+    drawXPChart(xpData.transaction);
+
+    const auditData = await loadAuditRatio();
+    drawAuditChart(auditData.user[0].auditRatio);
+
+    const voteData = await loadProjectRatio();
+    drawProjectChart(voteData.user[0].totalUp, voteData.user[0].totalDown);
+
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => {
+        localStorage.removeItem("jwt");
+        window.location.href = "index.html";
+      });
+    } else {
+      console.warn("Logout button not found.");
+    }
+
   } catch (err) {
     console.error("Error loading data:", err.message);
+    alert("Error loading dashboard data. Please login again.");
+    window.location.href = "index.html";
   }
 });
 
-// XP Query
+// Queries (same as before)
 async function loadXPData() {
-  const query = `
-    {
-      transaction(where: { type: { _eq: "xp" } }) {
-        amount
-        path
-        createdAt
-      }
+  const query = `{
+    transaction(where: { type: { _eq: "xp" } }) {
+      amount
+      path
+      createdAt
     }
-  `;
-  const data = await fetchGraphData(query);
-  console.log("XP Data:", data);
-  drawXPChart(data.transaction)
+  }`;
+  return await fetchGraphData(query);
 }
 
-// Audit Ratio Query
 async function loadAuditRatio() {
-  const query = `
-    {
-      user {
-        auditRatio
-      }
-    }
-  `;
-  const data = await fetchGraphData(query);
-  console.log("Audit Ratio:", data);
-   drawAuditChart(data.user[0].auditRatio)
+  const query = `{ user { auditRatio } }`;
+  return await fetchGraphData(query);
 }
 
-// Project Ratio Query
 async function loadProjectRatio() {
-  const query = `
-    {
-      user {
-        totalUp
-        totalDown
-      }
-    }
-  `;
-  const data = await fetchGraphData(query);
-  console.log("Project Ratio:", data);
-  drawProjectChart(data.user[0].totalUp, data.user[0].totalDown)
+  const query = `{ user { totalUp totalDown } }`;
+  return await fetchGraphData(query);
 }
+
+// Chart functions (same as before)
 function drawXPChart(data) {
-  const ctx = document.getElementById("xpChart").getContext("2d");
+  const ctx = document.getElementById("xpChart")?.getContext("2d");
+  if (!ctx) return;
 
   const labels = data.map(item => new Date(item.createdAt).toLocaleDateString());
   const amounts = data.map(item => item.amount);
@@ -63,7 +68,7 @@ function drawXPChart(data) {
   new Chart(ctx, {
     type: "line",
     data: {
-      labels: labels,
+      labels,
       datasets: [{
         label: "XP Earned",
         data: amounts,
@@ -72,52 +77,40 @@ function drawXPChart(data) {
         fill: true,
         tension: 0.3
       }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: { beginAtZero: true }
-      }
     }
   });
 }
 
 function drawAuditChart(ratio) {
-  const ctx = document.getElementById("auditChart").getContext("2d");
+  const ctx = document.getElementById("auditChart")?.getContext("2d");
+  if (!ctx) return;
 
   new Chart(ctx, {
     type: "doughnut",
     data: {
-      labels: ["Audit Contribution", "Other"],
+      labels: ["Audit", "Other"],
       datasets: [{
         data: [ratio, 1 - ratio],
         backgroundColor: ["green", "#ccc"]
       }]
-    },
-    options: {
-      responsive: true,
-      cutout: "70%",
     }
   });
 }
+
 function drawProjectChart(up, down) {
-  const ctx = document.getElementById("projectChart").getContext("2d");
+  const ctx = document.getElementById("projectChart")?.getContext("2d");
+  if (!ctx) return;
 
   new Chart(ctx, {
     type: "bar",
     data: {
       labels: ["Upvotes", "Downvotes"],
       datasets: [{
-        label: "Project Votes",
+        label: "Votes",
         data: [up, down],
         backgroundColor: ["#4CAF50", "#F44336"]
       }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: { beginAtZero: true }
-      }
     }
   });
 }
+
