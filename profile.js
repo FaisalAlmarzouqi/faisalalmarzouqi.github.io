@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 //     const levelData = await loadUserLevelData();
 //         const userLevel = levelData.user[0]; // assume it's an array
-// console.log("levelData", levelData);
+// console.log("levelData", levelData); 
 
     // const userLevel = levelData.user[0]; // assume it's an array
     // drawUserLevelSVG(userLevel.level, userLevel.experience);
@@ -258,8 +258,7 @@ function drawXPSVG(transactions) {
     }
   }
 }
-// Add the new chart function for User Level
-// Example of fetching and processing user level data
+// Load and render user level data
 async function loadUserLevelData() {
   const query = `
     {
@@ -273,77 +272,62 @@ async function loadUserLevelData() {
       }
     }
   `;
-  
-  const levelData = await fetchGraphData(query);
-  console.log("Level Data:", levelData);  // Log the fetched data
-  
-  const user = levelData.user[0];  // Assuming there is one user
-  console.log("User:", user); // Log the user data
-  
-  // Ensure user.transactions is available
-  const transactions = user.transactions || [];
-  console.log("Transactions:", transactions);
 
-  const totalLevel = calculateLevelSum(transactions);  // Pass the transactions to the function
-  console.log("Total Level:", totalLevel);
+  try {
+    const levelData = await fetchGraphData(query);
+    console.log("Level Data:", levelData);
 
-  // Now display the user's level
-  document.getElementById("levelCard").innerHTML = `
-    <p>User ID: ${user.id}</p>
-    <p>Total Level: ${totalLevel}</p>
-  `;
+    const user = levelData.user[0]; // Assuming only one user
+    if (!user) {
+      console.error("No user data found.");
+      return;
+    }
 
-  // Optionally, render the level visually with an SVG
-  drawUserLevelSVG(totalLevel, transactions);
+    const transactions = user.transactions || [];
+    console.log("Transactions:", transactions);
+
+    const totalLevel = calculateLevelSum(transactions);
+    console.log("Total Level:", totalLevel);
+
+    // Display user info
+    const levelCard = document.getElementById("levelCard");
+    if (!levelCard) {
+      console.error("Element with id 'levelCard' not found.");
+      return;
+    }
+
+    levelCard.innerHTML = `
+      <p>User ID: ${user.id}</p>
+      <p>Total Level: ${totalLevel}</p>
+    `;
+
+    // Draw visual level representation
+    drawUserLevelSVG(totalLevel, transactions);
+
+  } catch (error) {
+    console.error("Error loading user level data:", error);
+  }
 }
 
+// Calculate total experience from transactions
 function calculateLevelSum(transactions) {
-  if (!transactions || transactions.length === 0) {
-    return 0;
-  }
-
-  return transactions.reduce((sum, transaction) => {
-    // Ensure you're accessing the correct field in the transaction
-    const experiencePoints = transaction.amount || 0; // Adjust if it's another field
-    return sum + experiencePoints;
-  }, 0);
+  return transactions.reduce((sum, tx) => sum + (tx.amount || 0), 0);
 }
 
-
-
-
-// Call loadUserLevelData when the page is loaded
-document.addEventListener("DOMContentLoaded", () => {
-  loadUserLevelData();
-  const userLevelElement = document.getElementById("levelCard");
-  if (userLevelElement) {
-      // Your code to update the element goes here
-  } else {
-      console.error("Element not found: levelCard");
-  }
-});
-
-
-function drawUserLevelSVG(level, experience) {
-  // Log the level and experience values
-  console.log("Level: ", level); 
-  console.log("Experience: ", experience);
-
-  if (isNaN(level) || isNaN(experience)) {
-    console.error("Invalid level or experience data.");
-    return; // Exit if values are not valid
-  }
-
+// Draw the user level bar as an SVG
+function drawUserLevelSVG(level, transactions) {
   const svgNS = "http://www.w3.org/2000/svg";
   const width = 400;
   const height = 200;
   const barWidth = 300;
   const barHeight = 20;
 
-  const validLevel = Math.min(Math.max(level, 0), 100); // Ensure level is between 0 and 100
-  const levelPercent = (validLevel / 100) * 100;
+  // Clamp level to 0–100 range
+  const validLevel = Math.min(Math.max(level, 0), 100);
+  const levelPercent = validLevel;
 
-  const validExperience = !isNaN(experience) ? experience : 0;
+  // Total XP (experience points)
+  const totalXP = transactions.reduce((sum, tx) => sum + (tx.amount || 0), 0);
 
   const svg = document.createElementNS(svgNS, "svg");
   svg.setAttribute("width", width);
@@ -351,64 +335,53 @@ function drawUserLevelSVG(level, experience) {
   svg.style.background = "#1e1e1e";
   svg.style.borderRadius = "12px";
 
-  // Title
-  const title = document.createElementNS(svgNS, "text");
-  title.setAttribute("x", 20);
-  title.setAttribute("y", 30);
-  title.setAttribute("fill", "#ffffff");
-  title.setAttribute("font-size", "16");
-  title.setAttribute("font-weight", "bold");
-  title.textContent = "Current Level";
-  svg.appendChild(title);
+  const elements = [
+    createSVGText(svgNS, "Current Level", 20, 30, "#ffffff", 16, "bold"),
+    createSVGText(svgNS, `Lv. ${validLevel}`, 20, 70, "#00d0aa", 40, "bold"),
+    createSVGRect(svgNS, 20, 100, barWidth, barHeight, "#444", 10),
+    createSVGRect(svgNS, 20, 100, (levelPercent / 100) * barWidth, barHeight, "#00aaff", 10),
+    createSVGText(svgNS, `${totalXP.toLocaleString()} XP`, 20, 150, "#aaa", 14)
+  ];
 
-  // Level number
-  const levelText = document.createElementNS(svgNS, "text");
-  levelText.setAttribute("x", 20);
-  levelText.setAttribute("y", 70);
-  levelText.setAttribute("fill", "#00d0aa");
-  levelText.setAttribute("font-size", "40");
-  levelText.setAttribute("font-weight", "bold");
-  levelText.textContent = `Lv. ${validLevel}`;
-  svg.appendChild(levelText);
+  elements.forEach(el => svg.appendChild(el));
 
-  // Progress bar background
-  const bgBar = document.createElementNS(svgNS, "rect");
-  bgBar.setAttribute("x", 20);
-  bgBar.setAttribute("y", 100);
-  bgBar.setAttribute("width", barWidth);
-  bgBar.setAttribute("height", barHeight);
-  bgBar.setAttribute("fill", "#444");
-  bgBar.setAttribute("rx", 10);
-  svg.appendChild(bgBar);
-
-  // Progress bar fill
-  const fgBar = document.createElementNS(svgNS, "rect");
-  fgBar.setAttribute("x", 20);
-  fgBar.setAttribute("y", 100);
-  fgBar.setAttribute("width", (levelPercent / 100) * barWidth);
-  fgBar.setAttribute("height", barHeight);
-  fgBar.setAttribute("fill", "#00aaff");
-  fgBar.setAttribute("rx", 10);
-  svg.appendChild(fgBar);
-
-  // Experience text
-  const xpText = document.createElementNS(svgNS, "text");
-  xpText.setAttribute("x", 20);
-  xpText.setAttribute("y", 150);
-  xpText.setAttribute("fill", "#aaa");
-  xpText.setAttribute("font-size", "14");
-  xpText.textContent = `${validExperience.toLocaleString()} XP`;
-  svg.appendChild(xpText);
-
-  // Append to the container
   const container = document.getElementById("levelCard");
   if (container) {
-    container.innerHTML = "";
     container.appendChild(svg);
   } else {
-    console.error("Container element with id 'levelCard' not found.");
+    console.error("Container with id 'levelCard' not found.");
   }
 }
+
+// Helper: create text element for SVG
+function createSVGText(ns, content, x, y, color, fontSize, weight = "normal") {
+  const text = document.createElementNS(ns, "text");
+  text.setAttribute("x", x);
+  text.setAttribute("y", y);
+  text.setAttribute("fill", color);
+  text.setAttribute("font-size", fontSize);
+  if (weight) text.setAttribute("font-weight", weight);
+  text.textContent = content;
+  return text;
+}
+
+// Helper: create rect element for SVG
+function createSVGRect(ns, x, y, width, height, fill, rx = 0) {
+  const rect = document.createElementNS(ns, "rect");
+  rect.setAttribute("x", x);
+  rect.setAttribute("y", y);
+  rect.setAttribute("width", width);
+  rect.setAttribute("height", height);
+  rect.setAttribute("fill", fill);
+  rect.setAttribute("rx", rx);
+  return rect;
+}
+
+// Call the function on page load
+document.addEventListener("DOMContentLoaded", () => {
+  loadUserLevelData();
+});
+
 
 
 

@@ -5,139 +5,145 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>GraphQL Dashboard</title>
   <style>
-   body {
-  margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f2f2f2;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
+    /* Global Styles */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121212;
+      color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
-.container {
-  background: white;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+    .container {
+      background: #1e1e1e;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-h2 {
-  text-align: center;
-  margin-bottom: 0.5rem;
-  font-size: 1.5rem;
-}
+    h2, h3 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
 
-h3 {
-  text-align: center;
-  margin-bottom: 1rem;
-  font-size: 1rem;
-  font-weight: normal;
-  text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-}
+    h2 {
+      font-size: 1.5rem;
+      color: #ffffff;
+    }
 
-#loginForm {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  /* Remove align-items to prevent centering */
-}
+    h3 {
+      font-size: 1rem;
+      font-weight: normal;
+      color: #b0b0b0;
+    }
 
-input, button {
-  display: block;
-  width: 100%; /* Ensure inputs and button are full-width */
-  margin: 10px 0;
-  padding: 12px;
-  font-size: 1rem;
-  border-radius: 10px;
-  box-sizing: border-box;
-}
+    /* Form Styles */
+    #loginForm {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
 
-input {
-  border: 1px solid #ddd;
-}
+    input, button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 10px;
+      box-sizing: border-box;
+    }
 
-button {
-  background-color: #222;
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
+    input {
+      background: #333;
+      border: 1px solid #444;
+      color: #fff;
+    }
 
-button:hover {
-  background-color: #444;
-}
+    input:focus {
+      border-color: #6200ea;
+      outline: none;
+    }
 
-#dashboard {
-  display: none;
-}
+    button {
+      background-color: #6200ea;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
 
-.error-message {
-  color: red;
-  font-size: 0.9rem;
-  margin-top: 10px;
-  display: none;
-}
-.error-message.show {
-  display: block;
-}
+    button:hover {
+      background-color: #3700b3;
+    }
 
+    /* Dashboard Styles */
+    #dashboard {
+      display: none;
+      color: #e0e0e0;
+    }
 
-  /* Add some styles for loading and profile data section */
-  #loading {
+    #loading {
       display: none;
       text-align: center;
       margin-top: 20px;
       font-size: 1.2rem;
     }
+
     .profile-data {
       margin-top: 20px;
+    }
+
+    .error-message {
+      color: red;
+      font-size: 0.9rem;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
     }
   </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Wrap the login section in a div with id "loginForm" -->
-            
+  <div class="container">
+    <!-- Login Form -->
     <form id="loginForm">
-        <h2>Login</h2>
-        <h3>To access your information</h3>
-        <input type="text" id="identifier" placeholder="Email or Username" required />
-        <input type="password" id="password" placeholder="Password" required />
-        <button type="submit">Login</button>
-        <div id="errorMessage" class="error-message"></div>
-     </form>
-  
-      
-        <!-- Old Dashboard Structure -->
-        <div id="dashboard" style="display: none;">
-          <h2>Welcome!</h2>
-          <p>You are now logged in.</p>
-          <div id="loading">Loading your data...</div>
-      
-          <!-- Profile Data is now in a new container -->
-          <div id="profile-container">
-              <div id="userName"></div>
-              <div id="email"></div>
-              <div id="userLevel"></div>
-              <div id="userXP"></div>
-              <div id="audit"></div>
-              <div id="xpGraph"></div>
-              <div id="auditRatioGraph"></div>
-          </div>
-      
-          <!-- Log Out Button -->
-          <button onclick="logout()">Log Out</button>
-        </div>
+      <h2>Login</h2>
+      <h3>To access your information</h3>
+      <input type="text" id="identifier" placeholder="Email or Username" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+      <div id="errorMessage" class="error-message"></div>
+    </form>
+
+    <!-- Dashboard -->
+    <div id="dashboard">
+      <h2>Welcome!</h2>
+      <p>You are now logged in.</p>
+      <div id="loading">Loading your data...</div>
+      <div id="profile-container" class="profile-data">
+        <div id="userName"></div>
+        <div id="email"></div>
+        <div id="userLevel"></div>
+        <div id="userXP"></div>
+        <div id="audit"></div>
+        <div id="xpGraph"></div>
+        <div id="auditRatioGraph"></div>
       </div>
-      
-      <script src="login.js" defer></script>
-      
+      <button onclick="logout()">Log Out</button>
+    </div>
+  </div>
+
+  <script src="login.js" defer></script>
 </body>
 </html>
