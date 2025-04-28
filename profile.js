@@ -13,17 +13,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Load and draw audit ratio data
     const auditData = await loadAuditRatio();
     const user = auditData.user[0]; // assume it's an array
-    drawAuditSVG(user.totalUp, user.totalDown, user.auditRatio);
+
+    // Divide the values by 100 before calling drawAuditSVG
+    const doneDivided = user.totalUp / 1000000;  // divide by 1000000 for proper scaling to MB
+    const receivedDivided = user.totalDown / 1000000;  // divide by 1000000 for proper scaling to MB
+
+    drawAuditSVG(doneDivided, receivedDivided, user.auditRatio);
    
     const xpData = await loadXPData();
     drawXPSVG(xpData.transaction);
-
-//     const levelData = await loadUserLevelData();
-//         const userLevel = levelData.user[0]; // assume it's an array
-// console.log("levelData", levelData); 
-
-    // const userLevel = levelData.user[0]; // assume it's an array
-    // drawUserLevelSVG(userLevel.level, userLevel.experience);
 
     // Setup logout functionality
     const logoutBtn = document.getElementById("logoutBtn");
@@ -61,18 +59,17 @@ async function loadAuditRatio() {
 function drawAuditSVG(done, received, ratio) {
   const svgNS = "http://www.w3.org/2000/svg";
   const width = 360;
-  const height = 200; // Increased height for better spacing
-  const maxVal = Math.max(done, received);
+  const height = 220;
+  const padding = 20;
 
   const svg = document.createElementNS(svgNS, "svg");
-  svg.setAttribute("width", width);
-  svg.setAttribute("height", height);
+  svg.setAttribute("width", "100%");
+  svg.setAttribute("height", "100%");
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
   svg.style.background = "#1e1e1e";
   svg.style.borderRadius = "12px";
-  svg.style.padding = "10px"; // Added padding to avoid text collision
 
-  // Function to create text elements in SVG
-  const createText = (x, y, content, size = 14, color = "#ffffff", weight = "normal") => {
+  const createText = (x, y, content, size = 11, color = "#ffffff", weight = "normal", anchor = "start") => {
     const text = document.createElementNS(svgNS, "text");
     text.setAttribute("x", x);
     text.setAttribute("y", y);
@@ -81,39 +78,61 @@ function drawAuditSVG(done, received, ratio) {
     text.setAttribute("font-size", size);
     text.setAttribute("font-weight", weight);
     text.setAttribute("font-family", "Segoe UI, sans-serif");
+    text.setAttribute("text-anchor", anchor);
     return text;
   };
 
-  // Function to create bar elements in SVG
   const createBar = (x, y, barWidth, color) => {
     const bar = document.createElementNS(svgNS, "rect");
     bar.setAttribute("x", x);
     bar.setAttribute("y", y);
     bar.setAttribute("width", barWidth);
-    bar.setAttribute("height", 10); // Increased bar height for better visibility
+    bar.setAttribute("height", 6); // Thin bar
     bar.setAttribute("fill", color);
-    bar.setAttribute("rx", 5); // Rounded corners for the bars
+    bar.setAttribute("rx", 3);
     return bar;
   };
 
+  const maxVal = Math.max(done, received);
+  const barMaxWidth = width - padding * 2 - 80;
+
   // Title
-  svg.appendChild(createText(20, 25, "Audits Ratio", 16, "#ffffff", "500"));
+  svg.appendChild(createText(width / 2, padding, "Audit Ratio", 18, "#ffffff", "bold", "middle"));
 
-  // Done
-  svg.appendChild(createText(20, 55, "Done", 14));
-  svg.appendChild(createBar(80, 49, (done / maxVal) * 200, "#00d0aa"));
-  svg.appendChild(createText(290, 55, `${done.toFixed(2)} MB ↑`, 12, "#00d0aa"));
+  // Done Section
+  const doneY = 60;
+  svg.appendChild(createText(padding, doneY, "Done:", 13));
+  svg.appendChild(createBar(padding + 60, doneY - 6, (done / maxVal) * barMaxWidth, "#00d0aa"));
+  svg.appendChild(createText(
+    width - padding,
+    doneY + 14,   // moved **14px** below the bar
+    `${done.toFixed(2)} MB ↑`,  // 2 decimal places
+    10,
+    "#00d0aa",
+    "normal",
+    "end"
+  ));
 
-  // Received
-  svg.appendChild(createText(20, 85, "Received", 14));
-  svg.appendChild(createBar(80, 79, (received / maxVal) * 200, "#ffffff"));
-  svg.appendChild(createText(290, 85, `${received.toFixed(2)} MB ↓`, 12, "#ffffff"));
+  // Received Section
+  const receivedY = doneY + 40;
+  svg.appendChild(createText(padding, receivedY, "Received:", 13));
+  svg.appendChild(createBar(padding + 60, receivedY - 6, (received / maxVal) * barMaxWidth, "#ffffff"));
+  svg.appendChild(createText(
+    width - padding,
+    receivedY + 14,   // moved **14px** below the bar
+    `${received.toFixed(2)} MB ↓`, // 2 decimal places
+    10,
+    "#ffffff",
+    "normal",
+    "end"
+  ));
 
-  // Ratio
-  svg.appendChild(createText(5, 130, "Audit Ratio", 16, "#ffffff"));
-  svg.appendChild(createText(85, 130, ratio.toFixed(2), 30, "#00d0aa", "100"));
+  // Ratio Section
+  const ratioY = receivedY + 50;
+  svg.appendChild(createText(padding, ratioY, "Ratio:", 15));
+  svg.appendChild(createText(width / 2, ratioY + 10, ratio.toFixed(2), 26, "#00d0aa", "bold", "middle"));
 
-  // Label based on ratio
+  // Label
   const label = ratio >= 1.5
     ? "Excellent!"
     : ratio >= 1.2
@@ -121,12 +140,16 @@ function drawAuditSVG(done, received, ratio) {
     : ratio >= 1.0
     ? "Pretty good!"
     : "Needs work";
-  svg.appendChild(createText(85, 170, label, 16, "#00d0aa"));
+  svg.appendChild(createText(width / 2, ratioY + 50, label, 15, "#00d0aa", "normal", "middle"));
 
-  // Append SVG to the dashboard container
   document.getElementById("auditRatioCard").innerHTML = "";
   document.getElementById("auditRatioCard").appendChild(svg);
 }
+
+
+
+
+
 // LOAD XP DATA
 async function loadXPData() {
   const query = `
@@ -141,11 +164,13 @@ async function loadXPData() {
 }
 
 // DRAW XP SVG GRAPH
+// DRAW XP SVG GRAPH
+// DRAW XP SVG GRAPH
 function drawXPSVG(transactions) {
   const svgNS = "http://www.w3.org/2000/svg";
-  const width = 400;
-  const height = 250;
-  const margin = { top: 30, right: 20, bottom: 40, left: 50 };
+  const width = 450; // Slightly reduced width for better spacing
+  const height = 300;
+  const margin = { top: 40, right: 20, bottom: 60, left: 50 }; // Increased bottom margin to 60
   const chartWidth = width - margin.left - margin.right;
   const chartHeight = height - margin.top - margin.bottom;
 
@@ -156,7 +181,7 @@ function drawXPSVG(transactions) {
   svg.style.borderRadius = "12px";
 
   const chartGroup = document.createElementNS(svgNS, "g");
-  chartGroup.setAttribute("transform", `translate(${margin.left},${margin.top})`);
+  chartGroup.setAttribute("transform", `translate(${margin.left},${margin.top + 20})`);
   svg.appendChild(chartGroup);
 
   // Group XP by month
@@ -184,13 +209,14 @@ function drawXPSVG(transactions) {
   });
 
   const maxXP = Math.max(...data.map(d => d.xp));
-  const barWidth = chartWidth / data.length - 10;
 
-  
+  // Increase space between bars by adjusting barWidth and bar spacing
+  const barWidth = chartWidth / (data.length * 3); // Adjusted for more space between bars
+  const barSpacing = 25; // Increased space between bars
 
   // Bars + X Labels
   data.forEach((d, i) => {
-    const x = i * (barWidth + 10);
+    const x = i * (barWidth + barSpacing); // Adjusted x position for spacing
     const barHeight = (d.xp / maxXP) * chartHeight;
     const y = chartHeight - barHeight;
 
@@ -216,7 +242,7 @@ function drawXPSVG(transactions) {
 
     const labelGroup = document.createElementNS(svgNS, "text");
     labelGroup.setAttribute("x", x + barWidth / 2);
-    labelGroup.setAttribute("y", chartHeight + 12);
+    labelGroup.setAttribute("y", chartHeight + 20); // Adjusted Y position for labels
     labelGroup.setAttribute("text-anchor", "middle");
     labelGroup.setAttribute("fill", "#aaa");
     labelGroup.setAttribute("font-size", "10");
@@ -238,7 +264,7 @@ function drawXPSVG(transactions) {
 
   const title = document.createElementNS(svgNS, "text");
   title.setAttribute("x", margin.left);
-  title.setAttribute("y", 20);
+  title.setAttribute("y", margin.top - 10);
   title.setAttribute("fill", "#ffffff");
   title.setAttribute("font-size", 16);
   title.setAttribute("font-weight", "bold");
@@ -258,76 +284,84 @@ function drawXPSVG(transactions) {
     }
   }
 }
-// Load and render user level data
-async function loadUserLevelData() {
+
+
+
+// Load and render user skills data
+async function loadUserSkillData() {
   const query = `
     {
       user {
         id
-        transactions(where: {type: {_eq: "level"}}) {
+        transactions(
+          where: {
+            _and: [
+              { type: { _iregex: "(^|[^[:alnum:]])[[:alnum:]]*skill[[:alnum:]]*($|[^[:alnum:]])" } },
+              { type: { _like: "%skill%" } },
+              { object: { type: { _eq: "project" } } },
+              { type: { _in: [
+                "skill_prog", "skill_algo", "skill_sys-admin", "skill_front-end", 
+                "skill_back-end", "skill_stats", "skill_ai", "skill_game", "skill_tcp"
+              ]}}
+            ]
+          }
+          order_by: [{ type: asc }, { createdAt: desc }]
+          distinct_on: type
+        ) {
           amount
           type
-          createdAt
         }
       }
     }
   `;
 
   try {
-    const levelData = await fetchGraphData(query);
-    console.log("Level Data:", levelData);
+    const skillData = await fetchGraphData(query);
+    console.log("Skill Data:", skillData);
 
-    const user = levelData.user[0]; // Assuming only one user
+    const user = skillData.user[0];
     if (!user) {
       console.error("No user data found.");
       return;
     }
 
     const transactions = user.transactions || [];
-    console.log("Transactions:", transactions);
+    console.log("Skill Transactions:", transactions);
 
-    const totalLevel = calculateLevelSum(transactions);
-    console.log("Total Level:", totalLevel);
-
-    // Display user info
-    const levelCard = document.getElementById("levelCard");
-    if (!levelCard) {
-      console.error("Element with id 'levelCard' not found.");
+    // Display user skill info
+    const Skillsdone = document.getElementById("Skillsdone");
+    if (!Skillsdone) {
+      console.error("Element with id 'Skillsdone' not found.");
       return;
     }
 
-    levelCard.innerHTML = `
+    Skillsdone.innerHTML = `
       <p>User ID: ${user.id}</p>
-      <p>Total Level: ${totalLevel}</p>
+      <p>Total Skills: ${transactions.length}</p>
     `;
 
-    // Draw visual level representation
-    drawUserLevelSVG(totalLevel, transactions);
+    // Draw visual skill bars
+    drawUserSkillBars(transactions);
 
   } catch (error) {
-    console.error("Error loading user level data:", error);
+    console.error("Error loading user skill data:", error);
   }
 }
 
-// Calculate total experience from transactions
-function calculateLevelSum(transactions) {
-  return transactions.reduce((sum, tx) => sum + (tx.amount || 0), 0);
-}
-
-// Draw the user level bar as an SVG
-function drawUserLevelSVG(level, transactions) {
+// Draw the user's skills as individual bars
+// Draw the user's skills as individual bars
+function drawUserSkillBars(transactions) {
   const svgNS = "http://www.w3.org/2000/svg";
-  const width = 400;
-  const height = 200;
-  const barWidth = 300;
+  const width = 500; // Total width for the SVG (including space for XP numbers)
   const barHeight = 20;
+  const barSpacing = 10;
+  const labelWidth = 100; // Width for the skill labels
+  const maxBarWidth = width - labelWidth - 40; // Space for bars and XP numbers (adjusted)
 
-  // Clamp level to 0–100 range
-  const validLevel = Math.min(Math.max(level, 0), 100);
-  const levelPercent = validLevel;
+  const height = transactions.length * (barHeight + barSpacing) + 40;
 
-  // Total XP (experience points)
-  const totalXP = transactions.reduce((sum, tx) => sum + (tx.amount || 0), 0);
+  // Determine the maximum amount for scaling
+  const maxAmount = Math.max(...transactions.map(tx => tx.amount || 0));
 
   const svg = document.createElementNS(svgNS, "svg");
   svg.setAttribute("width", width);
@@ -335,21 +369,32 @@ function drawUserLevelSVG(level, transactions) {
   svg.style.background = "#1e1e1e";
   svg.style.borderRadius = "12px";
 
-  const elements = [
-    createSVGText(svgNS, "Current Level", 20, 30, "#ffffff", 16, "bold"),
-    createSVGText(svgNS, `Lv. ${validLevel}`, 20, 70, "#00d0aa", 40, "bold"),
-    createSVGRect(svgNS, 20, 100, barWidth, barHeight, "#444", 10),
-    createSVGRect(svgNS, 20, 100, (levelPercent / 100) * barWidth, barHeight, "#00aaff", 10),
-    createSVGText(svgNS, `${totalXP.toLocaleString()} XP`, 20, 150, "#aaa", 14)
-  ];
+  transactions.forEach((tx, index) => {
+    const y = 20 + index * (barHeight + barSpacing); // Vertical position for each bar
+    const barWidth = (tx.amount / maxAmount) * maxBarWidth; // Calculate the width of the bar
 
-  elements.forEach(el => svg.appendChild(el));
+    // Skill Label
+    const label = createSVGText(svgNS, tx.type.replace("skill_", "").replace("-", " "), 20, y + barHeight - 5, "#ffffff", 14, "bold");
+    svg.appendChild(label);
 
-  const container = document.getElementById("levelCard");
+    // Background Bar
+    const bgBar = createSVGRect(svgNS, labelWidth, y, maxBarWidth, barHeight, "#444", 10);
+    svg.appendChild(bgBar);
+
+    // Foreground Bar
+    const fgBar = createSVGRect(svgNS, labelWidth, y, barWidth, barHeight, "#00aaff", 10);
+    svg.appendChild(fgBar);
+
+    // Amount Text (XP number attached to the end of the bar)
+    const amountText = createSVGText(svgNS, `${tx.amount} XP`, labelWidth + barWidth + 10, y + barHeight / 2, "#aaa", 12); // Placing it at the end of the bar
+    svg.appendChild(amountText);
+  });
+
+  const container = document.getElementById("Skillsdone");
   if (container) {
     container.appendChild(svg);
   } else {
-    console.error("Container with id 'levelCard' not found.");
+    console.error("Container with id 'Skillsdone' not found.");
   }
 }
 
@@ -361,6 +406,7 @@ function createSVGText(ns, content, x, y, color, fontSize, weight = "normal") {
   text.setAttribute("fill", color);
   text.setAttribute("font-size", fontSize);
   if (weight) text.setAttribute("font-weight", weight);
+  text.setAttribute("alignment-baseline", "middle"); // Vertically center text
   text.textContent = content;
   return text;
 }
@@ -377,10 +423,14 @@ function createSVGRect(ns, x, y, width, height, fill, rx = 0) {
   return rect;
 }
 
+
+
+
 // Call the function on page load
 document.addEventListener("DOMContentLoaded", () => {
-  loadUserLevelData();
+  loadUserSkillData();
 });
+
 
 
 
