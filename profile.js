@@ -163,8 +163,7 @@ async function loadXPData() {
   return await fetchGraphData(query);
 }
 
-// DRAW XP SVG GRAPH
-// DRAW XP SVG GRAPH
+
 // DRAW XP SVG GRAPH
 function drawXPSVG(transactions) {
   const svgNS = "http://www.w3.org/2000/svg";
@@ -285,14 +284,11 @@ function drawXPSVG(transactions) {
   }
 }
 
-
-
 // Load and render user skills data
 async function loadUserSkillData() {
   const query = `
     {
       user {
-        id
         transactions(
           where: {
             _and: [
@@ -336,7 +332,6 @@ async function loadUserSkillData() {
     }
 
     Skillsdone.innerHTML = `
-      <p>User ID: ${user.id}</p>
       <p>Total Skills: ${transactions.length}</p>
     `;
 
@@ -348,7 +343,6 @@ async function loadUserSkillData() {
   }
 }
 
-// Draw the user's skills as individual bars
 // Draw the user's skills as individual bars
 function drawUserSkillBars(transactions) {
   const svgNS = "http://www.w3.org/2000/svg";
@@ -423,58 +417,63 @@ function createSVGRect(ns, x, y, width, height, fill, rx = 0) {
   return rect;
 }
 
-
-
-
 // Call the function on page load
 document.addEventListener("DOMContentLoaded", () => {
   loadUserSkillData();
+  loadUserBasicInfo(); 
 });
 
+// Load and render basic user info
+async function loadUserBasicInfo() {
+  const query = `
+    {
+      user {
+        id
+        login
+        email
+        attrs
+      }
+    }
+  `;
 
+  try {
+    const data = await fetchGraphData(query);
+    const user = data.user[0];
 
+    if (!user) {
+      console.error("No user info found.");
+      return;
+    }
 
+    // Handle attrs (may be stringified)
+    const attrs = typeof user.attrs === "string" ? JSON.parse(user.attrs) : user.attrs;
 
+    // Update DOM elements
+    document.getElementById("username").textContent = user.login || "User";
+   
+    drawUserBasicInfo({ ...user, attrs });
 
+  } catch (error) {
+    console.error("Failed to load user info:", error);
+  }
+}
 
+// Render user info card
+function drawUserBasicInfo(user) {
+  const container = document.getElementById("user-info-section");
+  if (!container) return;
 
-// Additional chart functions (same as before)
-// function drawXPChart(data) {
-//   const ctx = document.getElementById("xpChart")?.getContext("2d");
-//   if (!ctx) return;
+  container.innerHTML = "";
 
-//   const labels = data.map(item => new Date(item.createdAt).toLocaleDateString());
-//   const amounts = data.map(item => item.amount);
+  const infoItems = [
+    { label: "User ID", value: user.id },
+    { label: "Username", value: user.login },
+    { label: "Email", value: user.email }
+  ];
 
-//   new Chart(ctx, {
-//     type: "line",
-//     data: {
-//       labels,
-//       datasets: [{
-//         label: "XP Earned",
-//         data: amounts,
-//         borderColor: "blue",
-//         backgroundColor: "rgba(0, 0, 255, 0.1)",
-//         fill: true,
-//         tension: 0.3
-//       }]
-//     }
-//   });
-// }
-
-// function drawProjectChart(up, down) {
-//   const ctx = document.getElementById("projectChart")?.getContext("2d");
-//   if (!ctx) return;
-
-//   new Chart(ctx, {
-//     type: "bar",
-//     data: {
-//       labels: ["Upvotes", "Downvotes"],
-//       datasets: [{
-//         label: "Votes",
-//         data: [up, down],
-//         backgroundColor: ["#4CAF50", "#F44336"]
-//       }]
-//     }
-//   });
-// }
+  infoItems.forEach(item => {
+    const p = document.createElement("p");
+    p.innerHTML = `<strong>${item.label}:</strong> ${item.value}`;
+    container.appendChild(p);
+  });
+}
