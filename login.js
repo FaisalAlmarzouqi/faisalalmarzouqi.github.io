@@ -10,9 +10,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const identifier = document.getElementById("identifier").value;
     const password = document.getElementById("password").value;
+    const errorDiv = document.getElementById("errorMessage");
+    errorDiv.classList.remove("show");
+    errorDiv.textContent = "";
 
     if (!identifier || !password) {
-      alert("Please enter both identifier and password.");
+      errorDiv.textContent = "Please enter both identifier and password.";
+      errorDiv.classList.add("show");
       return;
     }
 
@@ -35,22 +39,23 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const data = await response.json();
-      console.log("Response Data: ", data);  // Log the response data
+      console.log("Response Data: ", data);
 
-      // Since the response is the token itself
       const token = data;
 
-            if (token) {
+      if (token) {
         localStorage.setItem("jwt", token);
+        errorDiv.classList.remove("show");
+        errorDiv.textContent = "";
         window.location.href = "dashbored.html";
       } else {
         throw new Error("Token not received");
       }
 
     } catch (err) {
-      alert("Login failed: " + err.message);
+      errorDiv.textContent = "Invalid credentials. Try again";
+      errorDiv.classList.add("show");
       console.error(err);
     }
   });
 });
-
