@@ -105,7 +105,7 @@ function drawAuditSVG(done, received, ratio) {
   svg.appendChild(createBar(padding + 60, doneY - 6, (done / maxVal) * barMaxWidth, "#00d0aa"));
   svg.appendChild(createText(
     width - padding,
-    doneY + 14,   // moved **14px** below the bar
+    doneY + 14,   
     `${done.toFixed(2)} MB ↑`,  // 2 decimal places
     10,
     "#00d0aa",
@@ -468,7 +468,7 @@ function drawUserBasicInfo(user) {
   const infoItems = [
     { label: "User ID", value: user.id },
     { label: "Username", value: user.login },
-    { label: "Email", value: user.email }
+    { label: "Email", value: user.email },
   ];
 
   infoItems.forEach(item => {
@@ -477,3 +477,95 @@ function drawUserBasicInfo(user) {
     container.appendChild(p);
   });
 }
+
+
+async function loadProjectXPData() {
+  const query = `
+    {
+      transaction(
+        where: {
+          type: { _eq: "xp" },
+          object: { type: { _eq: "project" } }
+        }
+        order_by: { createdAt: desc }
+      ) {
+        amount
+        object {
+          name
+        }
+      }
+    }
+  `;
+  return await fetchGraphData(query);
+}
+
+function displayProjectXP(projects) {
+  const container = document.getElementById("projectXPSection");
+  if (!container) return;
+
+  // Clear any previous content
+  container.innerHTML = "<h3 style='color:white;'></h3>";
+
+  const list = document.createElement("ul");
+  list.style.listStyleType = "none";
+  list.style.padding = "0";
+  list.style.margin = "0";
+
+  // Style the container itself
+  container.style.maxHeight = "250px";
+  container.style.overflowY = "auto";
+  container.style.width = "100%";
+  container.style.textAlign = "left";
+  container.style.paddingRight = "10px";
+  container.style.backgroundColor = "rgba(50, 50, 50, 0.6)";
+  container.style.borderRadius = "12px";
+  container.style.border = "1px solid rgba(255, 255, 255, 0.1)";
+  container.style.boxShadow = "0 2px 10px rgba(0, 0, 0, 0.3)";
+  container.style.padding = "10px";
+  container.style.boxSizing = "border-box";
+
+  // Optional: Scrollbar styles (for Firefox only, Chrome needs ::-webkit-scrollbar in CSS)
+  container.style.scrollbarWidth = "thin";
+  container.style.scrollbarColor = "rgba(255, 255, 255, 0.3) rgba(50, 50, 50, 0.6)";
+
+  projects.forEach((tx) => {
+    const name = tx.object?.name || "Unnamed Project";
+    const xp = tx.amount;
+    const kb = (xp / 1000).toFixed(1);  // Convert XP to kB
+
+    const li = document.createElement("li");
+
+    // Style each project item
+    li.style.backgroundColor = "rgba(70, 70, 70, 0.7)";
+    li.style.marginBottom = "10px";
+    li.style.padding = "12px";
+    li.style.borderRadius = "8px";
+    li.style.color = "#fff";
+    li.style.fontSize = "1.1rem";
+    li.style.transition = "background-color 0.3s ease";
+
+    // Hover effect
+    li.addEventListener("mouseenter", () => {
+      li.style.backgroundColor = "rgba(90, 90, 90, 0.8)";
+    });
+    li.addEventListener("mouseleave", () => {
+      li.style.backgroundColor = "rgba(70, 70, 70, 0.7)";
+    });
+
+    // Add the project kB display
+    li.innerText = `${name} – ${kb} kB`;
+
+    list.appendChild(li);
+  });
+
+  container.appendChild(list);
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const projectData = await loadProjectXPData();
+    displayProjectXP(projectData.transaction);
+  } catch (err) {
+    console.error("Error loading project XP data:", err);
+  }
+});

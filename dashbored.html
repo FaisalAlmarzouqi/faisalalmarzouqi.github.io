@@ -49,19 +49,31 @@
   color: black;
   box-shadow: 0 0 12px rgba(255, 0, 0, 0.5);
 }
+.full-width-card {
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+  max-width: 1040px; /* keeps it aligned with dashboard cards */
+  margin: 30px auto 20px auto; /* centers it and adds spacing below */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
-    .full-width-card {
-      background-color: #1e1e1e;
-      border-radius: 12px;
-      padding: 24px;
-      width: calc(100% - 40px);
-      margin: 30px 20px 0 20px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 200px;
-    }
+/* .full-width-card {
+  background-color: #1e1e1e;
+  border-radius: 0; 
+  padding: 24px 40px;
+  width: 100%;
+  margin: 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+} */
+
 
     .full-width-card h2,
     .full-width-card p {
@@ -165,19 +177,27 @@
   </div>
 
   <!-- Dashboard Cards -->
-  <div class="dashboard">
-    <div class="card" id="auditRatioCard">
-      <h2 class="title">Audit Ratio</h2>
-    </div>
+<div class="dashboard">
+  <div class="card" id="auditRatioCard">
+    <h2 class="title">Audit Ratio</h2>
+  </div>
 
-    <div class="card" id="xpChartCard">
-      <h2 class="title">XP Chart</h2>
-    </div>
+  <div class="card" id="xpChartCard">
+    <h2 class="title">XP Chart</h2>
+  </div>
 
-    <div class="card" id="Skillsdone">
-      <h2 class="title">Skills Done</h2>
+  <div class="card" id="Skillsdone">
+    <h2 class="title">Skills Done</h2>
+  </div>
+
+  <div class="card" id="projectXPCard">
+    <h2 class="title">Projects Done</h2>
+    <div id="projectXPSection" >
+      <!-- Project XP items will be injected here -->
     </div>
   </div>
+</div>
+
 
   <script type="module" src="profile.js"></script>
 </body>
